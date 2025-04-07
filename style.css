@@ -1,0 +1,107 @@
+/* styles.css */
+
+/* Global background and title style */
+body, .main {
+    background-color: yellow;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+h1 {
+    color: black;
+    text-align: center;
+    font-weight: bold;
+    font-size: 7vw;
+}
+
+/* Button styling */
+button, input[type="number"]::-webkit-inner-spin-button, .stFileUploader button {
+    transition: all 0.3s ease;
+}
+
+.stButton > button {
+    background-color: #28a428;
+    color: white;
+    font-weight: bold;
+    border-radius: 10px;
+    height: 3em;
+    width: 100%;
+    max-width: 400px;
+    margin: auto;
+    transition: all 0.3s ease;
+    border: 2px solid #28a428;
+    display: block;
+}
+
+.stButton > button:hover {
+    background-color: #008500;
+    border: 2px solid #00FF00;
+    color: white;
+}
+
+.stButton > button:active {
+    border: 2px solid #28a428 !important;
+}
+
+/* Download button */
+.stDownloadButton > button {
+    background-color: black;
+    color: white;
+    font-weight: bold;
+    border-radius: 10px;
+    height: 3em;
+    width: 100%;
+    max-width: 400px;
+    margin: auto;
+    transition: all 0.3s ease;
+    display: block;
+}
+
+.stDownloadButton > button:hover {
+    background-color: black;
+    border: 1px solid red;
+    color: rgba(255, 0, 0, 0.735);
+}
+
+.stDownloadButton > button:focus,
+.stButton > button:focus {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Fix button text staying red after click */
+.stButton > button:focus {
+    color: white !important;
+}
+
+/* Media queries for mobile friendliness */
+@media only screen and (max-width: 768px) {
+    h1 {
+        font-size: 8vw;
+    }
+
+    .stMarkdown h3 {
+        font-size: 5vw;
+    }
+
+    iframe {
+        height: 60vh !important;
+    }
+}
+
+/* Hide the default drag-and-drop label */
+.upload-text-fix span {
+    visibility: hidden;
+    position: relative;
+}
+
+/* Custom label on top of hidden text */
+.upload-text-fix span::after {
+    content: 'Tap to select images';
+    visibility: visible;
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: black;
+    font-weight: bold;
+}
