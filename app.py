@@ -35,9 +35,11 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 uploaded_files = st.file_uploader(
-    "", type=["png", "jpg", "jpeg"], accept_multiple_files=True
+    "Upload images",  # Give it a real label
+    type=["png", "jpg", "jpeg"],
+    accept_multiple_files=True,
+    label_visibility="collapsed"  # This hides it visually, but it's still there for accessibility
 )
-
 
 # Layout selector
 layout_map = {
