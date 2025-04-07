@@ -33,8 +33,6 @@ uploaded_files = st.file_uploader(
 )
 
 # Layout selector
-layout = st.selectbox("Choose Layout Size", ["Very Small (4 per row)", "Small (3 per row)", "Medium (2 per row)", "Large (1 per row)"])
-
 layout_map = {
     "Very Small (4 per row)": 4,
     "Small (3 per row)": 3,
@@ -42,7 +40,9 @@ layout_map = {
     "Large (1 per row)": 1
 }
 
-num_per_row = layout_map.get(layout, 1)  # Fallback to 1 per row if layout is broken
+layout = st.selectbox("Choose Layout Size", list(layout_map.keys()))
+num_per_row = layout_map.get(layout, 1)  # <-- fallback in case layout is None or bad
+
 
 # A4 setup
 margin = 10
@@ -61,8 +61,8 @@ target_width = int((a4_width - total_margin_space) / num_per_row)
 #         cols[i % num_per_row].image(resized_img, use_container_width=True)
 
 # Image Preview
-if uploaded_files:
-    st.markdown("### Images Preview")
+if uploaded_files and num_per_row > 0:
+    st.markdown("### Image Previews")
     cols = st.columns(num_per_row)
     for i, file in enumerate(uploaded_files):
         img = Image.open(file)
