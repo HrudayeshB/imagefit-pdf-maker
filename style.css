@@ -88,17 +88,22 @@ input[type="number"]::-webkit-inner-spin-button,
 
 /* Remove blue glow or red border after click */
 .stDownloadButton > button:focus,
+/* Fix Generate button color & hover getting stuck after click */
 .stButton > button:focus {
     outline: none !important;
     box-shadow: none !important;
-}
-
-/* Fix Generate button staying red after click */
-.stButton > button:focus {
+    border: 2px solid #28a428 !important;
     color: white !important;
     background-color: #28a428 !important;
-    border: 2px solid #28a428 !important;
 }
+
+/* Force hover effect to apply even when focused */
+.stButton > button:focus:hover {
+    background-color: #008500 !important;
+    border: 2px solid #00FF00 !important;
+    color: white !important;
+}
+
 
 
 /* === MOBILE RESPONSIVENESS === */
