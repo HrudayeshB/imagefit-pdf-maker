@@ -116,4 +116,4 @@ if st.button("Generate PDF"):
 
 # Footer
 st.markdown("<hr style='border: 1px solid red;'>", unsafe_allow_html=True)
-st.markdown("<div style='text-align: center; font-size: 15px; opacity: 0.7;'>Made by HB and Streamlit</div>", unsafe_allow_html=True)
+st.markdown("<div style='text-align: center; font-size: 15px; opacity: 0.7;'>Made by HB with Streamlit</div>", unsafe_allow_html=True)
