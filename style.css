@@ -1,4 +1,8 @@
 /* styles.css */
+html, body, .main {
+    background-color: white !important;
+    color: black !important;
+}
 
 /* Global background and title style */
 body, .main {
