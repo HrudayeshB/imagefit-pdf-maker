@@ -1,15 +1,19 @@
-/* styles.css */
+/* === GLOBAL STYLES === */
+
 html, body, .main {
     background-color: white !important;
     color: black !important;
 }
 
-/* Global background and title style */
+/* Main background and padding */
 body, .main {
     background-color: yellow;
     padding: 1rem;
     box-sizing: border-box;
 }
+
+
+/* === TITLE === */
 
 h1 {
     color: black;
@@ -18,10 +22,17 @@ h1 {
     font-size: 7vw;
 }
 
-/* Button styling */
-button, input[type="number"]::-webkit-inner-spin-button, .stFileUploader button {
+
+/* === GENERAL BUTTON STYLES === */
+
+button,
+input[type="number"]::-webkit-inner-spin-button,
+.stFileUploader button {
     transition: all 0.3s ease;
 }
+
+
+/* === GENERATE PDF BUTTON === */
 
 .stButton > button {
     background-color: #28a428;
@@ -32,22 +43,26 @@ button, input[type="number"]::-webkit-inner-spin-button, .stFileUploader button 
     width: 100%;
     max-width: 400px;
     margin: auto;
+    display: block;
     transition: all 0.3s ease;
     border: 2px solid #28a428;
-    display: block;
 }
 
+/* Hover effect for Generate button */
 .stButton > button:hover {
     background-color: #008500;
     border: 2px solid #00FF00;
     color: white;
 }
 
+/* Active (clicked) state */
 .stButton > button:active {
     border: 2px solid #28a428 !important;
 }
 
-/* Download button */
+
+/* === DOWNLOAD PDF BUTTON === */
+
 .stDownloadButton > button {
     background-color: black;
     color: white;
@@ -57,28 +72,37 @@ button, input[type="number"]::-webkit-inner-spin-button, .stFileUploader button 
     width: 100%;
     max-width: 400px;
     margin: auto;
-    transition: all 0.3s ease;
     display: block;
+    transition: all 0.3s ease;
 }
 
+/* Hover effect for Download button */
 .stDownloadButton > button:hover {
     background-color: black;
     border: 1px solid red;
     color: rgba(255, 0, 0, 0.735);
 }
 
+
+/* === BUTTON FOCUS FIXES (REMOVE OUTLINE AFTER CLICK) === */
+
+/* Remove blue glow or red border after click */
 .stDownloadButton > button:focus,
 .stButton > button:focus {
     outline: none !important;
     box-shadow: none !important;
 }
 
-/* Fix button text staying red after click */
+/* Fix Generate button staying red after click */
 .stButton > button:focus {
     color: white !important;
+    background-color: #28a428 !important;
+    border: 2px solid #28a428 !important;
 }
 
-/* Media queries for mobile friendliness */
+
+/* === MOBILE RESPONSIVENESS === */
+
 @media only screen and (max-width: 768px) {
     h1 {
         font-size: 8vw;
@@ -93,13 +117,16 @@ button, input[type="number"]::-webkit-inner-spin-button, .stFileUploader button 
     }
 }
 
-/* Hide the default drag-and-drop label */
+
+/* === CUSTOM UPLOAD LABEL FOR MOBILE === */
+
+/* Hide the default drag-and-drop label text */
 .upload-text-fix span {
     visibility: hidden;
     position: relative;
 }
 
-/* Custom label on top of hidden text */
+/* Add custom text over it */
 .upload-text-fix span::after {
     content: 'Tap to select images';
     visibility: visible;
@@ -108,13 +135,4 @@ button, input[type="number"]::-webkit-inner-spin-button, .stFileUploader button 
     top: 0;
     color: black;
     font-weight: bold;
-}
-
-/* Fix button outline and color after click */
-.stButton > button:focus {
-    outline: none !important;
-    box-shadow: none !important;
-    border: 2px solid #28a428 !important;
-    color: white !important;
-    background-color: #28a428 !important; /* Reset the background too */
 }
