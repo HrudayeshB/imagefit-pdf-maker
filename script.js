@@ -1,18 +1,10 @@
-// mobile_label_fix.js
-document.addEventListener('DOMContentLoaded', function () {
-    function isMobileDevice() {
-        return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    }
+// script.js
 
-    const waitForUploader = setInterval(() => {
-        const labelEl = window.parent.document.querySelector('label[data-testid="stFileUploaderLabel"]');
-        if (labelEl) {
-            if (isMobileDevice()) {
-                labelEl.innerText = "Tap to select images 📱";
-            } else {
-                labelEl.innerText = "Drag and drop or browse to upload images 🖥️";
-            }
-            clearInterval(waitForUploader);
-        }
-    }, 100);
+window.addEventListener('DOMContentLoaded', () => {
+    const msgElement = document.getElementById("upload-instruction");
+    if (window.innerWidth < 768) {
+        msgElement.innerText = "Tap to select images (Mobile Friendly)";
+    } else {
+        msgElement.innerText = "Drag and drop or click to upload";
+    }
 });
