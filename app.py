@@ -7,7 +7,25 @@ from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
 import tempfile
 import base64
+import streamlit.components.v1 as components
 
+# Detect if user is on mobile (basic user-agent check)
+is_mobile = False
+if "HTTP_USER_AGENT" in st.session_state.get("request", {}):
+    user_agent = st.session_state["request"]["HTTP_USER_AGENT"]
+    is_mobile = "mobile" in user_agent.lower()
+
+# Or simpler fallback using window width
+if st.session_state.get("device_width", 800) < 768:
+    is_mobile = True
+
+# Instead of iframe preview
+if not is_mobile:
+    st.markdown("### PDF Preview")
+    pdf_display = f'<iframe src="data:application/pdf;base64,{b64_pdf}" width="100%" height="600px" type="application/pdf"></iframe>'
+    st.markdown(pdf_display, unsafe_allow_html=True)
+else:
+    st.markdown("⚠️ PDF preview not supported on mobile. Please download to view.")
 
 # Page config
 st.set_page_config(page_title="ImageFit PDF Maker", layout="centered")

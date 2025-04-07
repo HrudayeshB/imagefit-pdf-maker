@@ -109,3 +109,12 @@ button, input[type="number"]::-webkit-inner-spin-button, .stFileUploader button 
     color: black;
     font-weight: bold;
 }
+
+/* Fix button outline and color after click */
+.stButton > button:focus {
+    outline: none !important;
+    box-shadow: none !important;
+    border: 2px solid #28a428 !important;
+    color: white !important;
+    background-color: #28a428 !important; /* Reset the background too */
+}
