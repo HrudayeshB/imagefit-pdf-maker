@@ -17,9 +17,10 @@ css_path = os.path.join(os.path.dirname(__file__), "style.css")
 with open(css_path) as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-# Inject custom JS for device-based message
-with open("script.js", "r") as js_file:
+# Inject external JavaScript
+with open("script.js") as js_file:
     js_code = js_file.read()
+
 st.markdown(f"<script>{js_code}</script>", unsafe_allow_html=True)
 
 
@@ -27,18 +28,8 @@ st.markdown(f"<script>{js_code}</script>", unsafe_allow_html=True)
 st.markdown("<h1>ImageFit PDF Maker</h1>", unsafe_allow_html=True)
 st.markdown("<hr style='border: 1px solid red;'>", unsafe_allow_html=True)
 
-# File uploader wrapper with mobile/desktop specific message
-st.markdown("""
-<div class="upload-text-fix">
-    <p id="upload-instruction" class="custom-upload-text">Loading...</p>
-</div>
-""", unsafe_allow_html=True)
-
 uploaded_files = st.file_uploader(
-    "Upload images",  # Give it a real label
-    type=["png", "jpg", "jpeg"],
-    accept_multiple_files=True,
-    label_visibility="collapsed"  # This hides it visually, but it's still there for accessibility
+    "Upload images", type=["png", "jpg", "jpeg"], accept_multiple_files=True
 )
 
 # Layout selector
