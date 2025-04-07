@@ -13,7 +13,8 @@ import base64
 st.set_page_config(page_title="ImageFit PDF Maker", layout="centered")
 
 # Custom CSS
-with open("style.css") as f:
+css_path = os.path.join(os.path.dirname(__file__), "style.css")
+with open(css_path) as f:
     st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 # Inject external JavaScript
@@ -41,7 +42,7 @@ layout_map = {
     "Large (1 per row)": 1
 }
 
-num_per_row = layout_map[layout]
+num_per_row = layout_map.get(layout, 1)  # Fallback to 1 per row if layout is broken
 
 # A4 setup
 margin = 10
