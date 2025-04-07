@@ -5,27 +5,7 @@ import os
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
-import tempfile
 import base64
-import streamlit.components.v1 as components
-
-# Detect if user is on mobile (basic user-agent check)
-is_mobile = False
-if "HTTP_USER_AGENT" in st.session_state.get("request", {}):
-    user_agent = st.session_state["request"]["HTTP_USER_AGENT"]
-    is_mobile = "mobile" in user_agent.lower()
-
-# Or simpler fallback using window width
-if st.session_state.get("device_width", 800) < 768:
-    is_mobile = True
-
-# Instead of iframe preview
-if not is_mobile:
-    st.markdown("### PDF Preview")
-    pdf_display = f'<iframe src="data:application/pdf;base64,{b64_pdf}" width="100%" height="600px" type="application/pdf"></iframe>'
-    st.markdown(pdf_display, unsafe_allow_html=True)
-else:
-    st.markdown("⚠️ PDF preview not supported on mobile. Please download to view.")
 
 # Page config
 st.set_page_config(page_title="ImageFit PDF Maker", layout="centered")
@@ -38,14 +18,13 @@ with open(css_path) as f:
 # Inject external JavaScript
 with open("script.js") as js_file:
     js_code = js_file.read()
-
 st.markdown(f"<script>{js_code}</script>", unsafe_allow_html=True)
-
 
 # Title
 st.markdown("<h1>ImageFit PDF Maker</h1>", unsafe_allow_html=True)
 st.markdown("<hr style='border: 1px solid red;'>", unsafe_allow_html=True)
 
+# File uploader
 uploaded_files = st.file_uploader(
     "Upload images", type=["png", "jpg", "jpeg"], accept_multiple_files=True
 )
@@ -57,26 +36,14 @@ layout_map = {
     "Medium (2 per row)": 2,
     "Large (1 per row)": 1
 }
-
 layout = st.selectbox("Choose Layout Size", list(layout_map.keys()))
-num_per_row = layout_map.get(layout, 1)  # <-- fallback in case layout is None or bad
-
+num_per_row = layout_map.get(layout, 1)
 
 # A4 setup
 margin = 10
 a4_width, a4_height = A4
 total_margin_space = (num_per_row + 1) * margin
 target_width = int((a4_width - total_margin_space) / num_per_row)
-
-# # Image Preview
-# if uploaded_files:
-#     st.markdown("### Image Previews")
-#     cols = st.columns(num_per_row)
-#     for i, file in enumerate(uploaded_files):
-#         img = Image.open(file)
-#         aspect_ratio = img.height / img.width
-#         resized_img = img.resize((target_width, int(target_width * aspect_ratio)))
-#         cols[i % num_per_row].image(resized_img, use_container_width=True)
 
 # Image Preview
 if uploaded_files and num_per_row > 0:
@@ -85,7 +52,6 @@ if uploaded_files and num_per_row > 0:
     for i, file in enumerate(uploaded_files):
         img = Image.open(file)
         cols[i % num_per_row].image(img, use_container_width=True)
-
 
 # PDF Generation
 if st.button("Generate PDF"):
@@ -118,17 +84,19 @@ if st.button("Generate PDF"):
 
         c.save()
         buffer.seek(0)
-        pdf_bytes = buffer.getvalue()  # Get the PDF bytes once
+        pdf_bytes = buffer.getvalue()
+        b64_pdf = base64.b64encode(pdf_bytes).decode("utf-8")
 
-        # PDF Preview
-        b64_pdf = base64.b64encode(pdf_bytes).decode('utf-8')
+        # PDF Preview logic: only show on desktop
         st.markdown("### PDF Preview")
-        pdf_display = f'<iframe src="data:application/pdf;base64,{b64_pdf}" width="100%" height="600px" type="application/pdf"></iframe>'
-        st.markdown(pdf_display, unsafe_allow_html=True)
+        if st.session_state.get("device_width", 1024) >= 768:
+            pdf_display = f'<iframe src="data:application/pdf;base64,{b64_pdf}" width="100%" height="600px"></iframe>'
+            st.markdown(pdf_display, unsafe_allow_html=True)
+        else:
+            st.warning("⚠️ PDF preview not supported on mobile. Please download to view.")
 
-        # Download
+        # Download button
         st.download_button("⬇ Download PDF", data=pdf_bytes, file_name="output.pdf", mime="application/pdf")
-
     else:
         st.warning("Please upload images to generate the PDF.")
 
