@@ -43,6 +43,15 @@ layout_map = {
 layout = st.selectbox("Choose Layout Size", list(layout_map.keys()), index=2)
 num_per_row = layout_map.get(layout, 1)  # <-- fallback in case layout is None or bad
 
+st.markdown("### Optional: Manual Resize")
+manual_resize = st.checkbox("Manually enter image width and height?")
+
+custom_width = None
+custom_height = None
+
+if manual_resize:
+    custom_width = st.number_input("Custom Image Width (px)", min_value=100, max_value=1000, value=300, step=10)
+    custom_height = st.number_input("Custom Image Height (px)", min_value=100, max_value=1200, value=400, step=10)
 
 # A4 setup
 margin = 10
@@ -80,9 +89,13 @@ if st.button("Generate PDF"):
             if image.mode != "RGB":
                 image = image.convert("RGB")
 
-            aspect_ratio = image.height / image.width
-            img_width = target_width
-            img_height = int(img_width * aspect_ratio)
+            if manual_resize and custom_width and custom_height:
+                img_width = custom_width
+                img_height = custom_height
+            else:
+                aspect_ratio = image.height / image.width
+                img_width = target_width
+                img_height = int(img_width * aspect_ratio)
 
             if x_offset + img_width > a4_width - margin:
                 x_offset = margin
