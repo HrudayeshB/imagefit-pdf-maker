@@ -57,7 +57,7 @@ git clone https://github.com/your-username/imagefit-pdf-maker.git
 cd imagefit-pdf-maker
 pip install -r requirements.txt
 streamlit run app.py
-
+```
 ## ✨ Made By
 
 **Hrudayesh Bhaskara** — an engineer solving one small problem at a time 😉
