@@ -40,7 +40,7 @@ layout_map = {
     "Large (1 per row)": 1
 }
 
-layout = st.selectbox("Choose Layout Size", list(layout_map.keys()))
+layout = st.selectbox("Choose Layout Size", list(layout_map.keys()), index=2)
 num_per_row = layout_map.get(layout, 1)  # <-- fallback in case layout is None or bad
 
 
