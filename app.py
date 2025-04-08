@@ -50,16 +50,6 @@ a4_width, a4_height = A4
 total_margin_space = (num_per_row + 1) * margin
 target_width = int((a4_width - total_margin_space) / num_per_row)
 
-# # Image Preview
-# if uploaded_files:
-#     st.markdown("### Image Previews")
-#     cols = st.columns(num_per_row)
-#     for i, file in enumerate(uploaded_files):
-#         img = Image.open(file)
-#         aspect_ratio = img.height / img.width
-#         resized_img = img.resize((target_width, int(target_width * aspect_ratio)))
-#         cols[i % num_per_row].image(resized_img, use_container_width=True)
-
 # Image Preview
 if uploaded_files and num_per_row > 0:
     st.markdown("### Image Previews")
@@ -79,12 +69,11 @@ if st.button("Generate PDF"):
         y_offset = a4_height - margin
 
         # Sort images: short-height first, tall ones later (based on aspect ratio)
-        def get_img_height(file):
+        def get_aspect_ratio(file):
             img = Image.open(file)
-            aspect = img.height / img.width
-            return aspect
-        
-        sorted_files = sorted(st.session_state.selected_files, key=get_img_height)
+            return img.height / img.width
+
+        sorted_files = sorted(uploaded_files, key=get_aspect_ratio)
 
         for uploaded_file in sorted_files:
             image = Image.open(uploaded_file)
@@ -98,7 +87,7 @@ if st.button("Generate PDF"):
             if x_offset + img_width > a4_width - margin:
                 x_offset = margin
                 y_offset -= img_height + margin
-        
+
             if y_offset - img_height < margin:
                 c.showPage()
                 y_offset = a4_height - margin
@@ -106,10 +95,9 @@ if st.button("Generate PDF"):
             c.drawImage(ImageReader(image), x_offset, y_offset - img_height, width=img_width, height=img_height)
             x_offset += img_width + margin
 
-        
         c.save()
         buffer.seek(0)
-        pdf_bytes = buffer.getvalue()  # Get the PDF bytes once
+        pdf_bytes = buffer.getvalue()
 
         # PDF Preview
         b64_pdf = base64.b64encode(pdf_bytes).decode('utf-8')
