@@ -21,9 +21,13 @@ with open("script.js") as js_file:
 st.markdown(f"<script>{js_code}</script>", unsafe_allow_html=True)
 
 # Title
-st.markdown("<h1 style='text-align: center;'>ImageFit PDF Maker</h1>", unsafe_allow_html=True)
-st.markdown("<div style='text-align: center; font-size: 16px; opacity: 0.7;'>No more wasting paper - Fit your images smartly</div>", unsafe_allow_html=True)
-st.markdown("<hr style='border: 1px solid red;'>", unsafe_allow_html=True)
+st.markdown("""
+<div style='text-align: center;'>
+    <h1 style='margin-bottom: 0;'>ImageFit PDF Maker</h1>
+    <p style='margin-top: 5px; font-size: 18px; opacity: 0.7;'>No more wasting paper - Fit your images smartly</p>
+</div>
+<hr style='border: 1px solid red;'>
+""", unsafe_allow_html=True)
 
 uploaded_files = st.file_uploader(
     "Upload images", type=["png", "jpg", "jpeg"], accept_multiple_files=True
