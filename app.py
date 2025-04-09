@@ -8,7 +8,6 @@ from reportlab.lib.utils import ImageReader
 import tempfile
 import base64
 
-
 # Page config
 st.set_page_config(page_title="ImageFit PDF Maker", layout="centered")
 
@@ -22,7 +21,6 @@ with open("script.js") as js_file:
     js_code = js_file.read()
 
 st.markdown(f"<script>{js_code}</script>", unsafe_allow_html=True)
-
 
 # Title
 st.markdown("<h1>ImageFit PDF Maker</h1>", unsafe_allow_html=True)
@@ -41,7 +39,7 @@ layout_map = {
 }
 
 layout = st.selectbox("Choose Layout Size", list(layout_map.keys()), index=2)
-num_per_row = layout_map.get(layout, 1)  # <-- fallback in case layout is None or bad
+num_per_row = layout_map.get(layout, 1)
 
 st.markdown("Optional: Manual Resize")
 manual_resize = st.checkbox("Manually enter image width and height?")
@@ -52,6 +50,9 @@ custom_height = None
 if manual_resize:
     custom_width = st.number_input("Custom Image Width (px)", min_value=100, max_value=1000, value=300, step=10)
     custom_height = st.number_input("Custom Image Height (px)", min_value=100, max_value=1200, value=400, step=10)
+
+# NEW: Auto-rotate tall images toggle
+auto_rotate = st.checkbox("Auto-rotate tall images to landscape", value=True)
 
 # A4 setup
 margin = 10
@@ -67,7 +68,6 @@ if uploaded_files and num_per_row > 0:
         img = Image.open(file)
         cols[i % num_per_row].image(img, use_container_width=True)
 
-
 # PDF Generation
 if st.button("Generate PDF"):
     if uploaded_files:
@@ -77,7 +77,6 @@ if st.button("Generate PDF"):
         x_offset = margin
         y_offset = a4_height - margin
 
-        # Sort images: short-height first, tall ones later (based on aspect ratio)
         def get_aspect_ratio(file):
             img = Image.open(file)
             return img.height / img.width
@@ -89,6 +88,11 @@ if st.button("Generate PDF"):
             if image.mode != "RGB":
                 image = image.convert("RGB")
 
+            # Rotate if auto-rotate is enabled and image is portrait
+            if auto_rotate and image.height > image.width:
+                image = image.rotate(90, expand=True)
+
+            # Resizing logic
             if manual_resize and custom_width and custom_height:
                 img_width = custom_width
                 img_height = custom_height
@@ -97,10 +101,12 @@ if st.button("Generate PDF"):
                 img_width = target_width
                 img_height = int(img_width * aspect_ratio)
 
+            # New page if it doesn't fit horizontally
             if x_offset + img_width > a4_width - margin:
                 x_offset = margin
                 y_offset -= img_height + margin
 
+            # New page if it doesn't fit vertically
             if y_offset - img_height < margin:
                 c.showPage()
                 y_offset = a4_height - margin
@@ -120,7 +126,6 @@ if st.button("Generate PDF"):
 
         # Download
         st.download_button("⬇ Download PDF", data=pdf_bytes, file_name="output.pdf", mime="application/pdf")
-
     else:
         st.warning("Please upload images to generate the PDF.")
 
