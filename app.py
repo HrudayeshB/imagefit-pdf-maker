@@ -20,35 +20,10 @@ with open("script.js") as js_file:
     js_code = js_file.read()
 st.markdown(f"<script>{js_code}</script>", unsafe_allow_html=True)
 
-# Title and Tagline - Truly Full Page Centered
-st.markdown("""
-<style>
-.full-width-header {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    text-align: center;
-    margin-top: 20px;
-}
-.full-width-header h1 {
-    margin-bottom: 0;
-    font-size: 42px;
-}
-.full-width-header p {
-    margin-top: 6px;
-    font-size: 18px;
-    color: #666;
-}
-</style>
-
-<div class="full-width-header">
-    <div>
-        <h1>ImageFit PDF Maker</h1>
-        <p>Smarter layout. Cleaner prints.</p>
-    </div>
-</div>
-<hr style='border: 1px solid red;'>
-""", unsafe_allow_html=True)
+# Title and Tagline
+st.markdown("<h1 style='text-align: center;'>ImageFit PDF Maker</h1>", unsafe_allow_html=True)
+st.markdown("<div style='text-align: center; font-size: 16px; opacity: 0.7;'>Fit images. Save paper.</div>", unsafe_allow_html=True)
+st.markdown("<hr style='border: 1px solid red;'>", unsafe_allow_html=True)
 
 uploaded_files = st.file_uploader(
     "Upload images", type=["png", "jpg", "jpeg"], accept_multiple_files=True
