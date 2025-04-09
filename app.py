@@ -68,18 +68,17 @@ if st.button("Generate PDF"):
         buffer = io.BytesIO()
         c = canvas.Canvas(buffer, pagesize=A4)
 
-        y_offset = a4_height - margin
         processed = []
-
-        # First: open, rotate if needed, and resize to get height info
-        for file in uploaded_files:
-            img = Image.open(file)
+        for uploaded_file in uploaded_files:
+            img = Image.open(uploaded_file)
             if img.mode != "RGB":
                 img = img.convert("RGB")
 
+            # Auto-rotate tall images
             if auto_rotate and img.height > img.width:
                 img = img.rotate(90, expand=True)
 
+            # Resize
             if manual_resize and custom_width and custom_height:
                 img_width = custom_width
                 img_height = custom_height
@@ -90,22 +89,32 @@ if st.button("Generate PDF"):
 
             processed.append((img, img_width, img_height))
 
-        # Sort by height (shorter images first, taller go later)
-        processed.sort(key=lambda x: x[2])  # x[2] = height
+        # Sort by height (send tall ones last)
+        processed.sort(key=lambda x: x[2])
 
-        # Group into rows and draw
-        for i in range(0, len(processed), num_per_row):
-            row = processed[i:i + num_per_row]
-            max_row_height = max(img[2] for img in row)
+        used = [False] * len(processed)
+        y_offset = a4_height - margin
+
+        while not all(used):
+            x_offset = margin
+            row = []
+            max_row_height = 0
+
+            for idx, (img, w, h) in enumerate(processed):
+                if not used[idx] and x_offset + w <= a4_width - margin:
+                    row.append((img, w, h))
+                    used[idx] = True
+                    max_row_height = max(max_row_height, h)
+                    x_offset += w + margin
 
             if y_offset - max_row_height < margin:
                 c.showPage()
                 y_offset = a4_height - margin
 
             x_offset = margin
-            for img, img_width, img_height in row:
-                c.drawImage(ImageReader(img), x_offset, y_offset - img_height, width=img_width, height=img_height)
-                x_offset += img_width + margin
+            for img, w, h in row:
+                c.drawImage(ImageReader(img), x_offset, y_offset - h, width=w, height=h)
+                x_offset += w + margin
 
             y_offset -= max_row_height + margin
 
