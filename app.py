@@ -68,17 +68,16 @@ if st.button("Generate PDF"):
         buffer = io.BytesIO()
         c = canvas.Canvas(buffer, pagesize=A4)
 
-        processed = []
+        processed_images = []
+
         for uploaded_file in uploaded_files:
             img = Image.open(uploaded_file)
             if img.mode != "RGB":
                 img = img.convert("RGB")
 
-            # Auto-rotate tall images
             if auto_rotate and img.height > img.width:
                 img = img.rotate(90, expand=True)
 
-            # Resize
             if manual_resize and custom_width and custom_height:
                 img_width = custom_width
                 img_height = custom_height
@@ -87,36 +86,37 @@ if st.button("Generate PDF"):
                 img_width = target_width
                 img_height = int(img_width * aspect_ratio)
 
-            processed.append((img, img_width, img_height))
+            processed_images.append((img, img_width, img_height))
 
-        # Sort by height (send tall ones last)
-        processed.sort(key=lambda x: x[2])
+        # Sort tall images to the end
+        processed_images.sort(key=lambda x: x[2])  # sort by height
 
-        used = [False] * len(processed)
+        # Group images by similar height to reduce vertical gaps
+        grouped_rows = []
+        row = []
+        row_heights = []
+        for img, w, h in processed_images:
+            row.append((img, w, h))
+            row_heights.append(h)
+            if len(row) == num_per_row:
+                grouped_rows.append((row.copy(), max(row_heights)))
+                row = []
+                row_heights = []
+        if row:
+            grouped_rows.append((row, max(row_heights)))
+
+        # Start placing rows
         y_offset = a4_height - margin
-
-        while not all(used):
+        for row_imgs, row_height in grouped_rows:
             x_offset = margin
-            row = []
-            max_row_height = 0
-
-            for idx, (img, w, h) in enumerate(processed):
-                if not used[idx] and x_offset + w <= a4_width - margin:
-                    row.append((img, w, h))
-                    used[idx] = True
-                    max_row_height = max(max_row_height, h)
-                    x_offset += w + margin
-
-            if y_offset - max_row_height < margin:
+            if y_offset - row_height < margin:
                 c.showPage()
                 y_offset = a4_height - margin
-
-            x_offset = margin
-            for img, w, h in row:
-                c.drawImage(ImageReader(img), x_offset, y_offset - h, width=w, height=h)
+            for img, w, h in row_imgs:
+                y_pos = y_offset - h  # align bottom
+                c.drawImage(ImageReader(img), x_offset, y_pos, width=w, height=h)
                 x_offset += w + margin
-
-            y_offset -= max_row_height + margin
+            y_offset -= row_height + margin
 
         c.save()
         buffer.seek(0)
