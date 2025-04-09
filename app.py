@@ -1,4 +1,4 @@
-0import streamlit as st
+import streamlit as st
 from PIL import Image
 import io
 import os
@@ -68,44 +68,47 @@ if st.button("Generate PDF"):
         buffer = io.BytesIO()
         c = canvas.Canvas(buffer, pagesize=A4)
 
-        x_offset = margin
         y_offset = a4_height - margin
-        max_row_height = 0
 
-        for uploaded_file in uploaded_files:
-            img = Image.open(uploaded_file)
-            if img.mode != "RGB":
-                img = img.convert("RGB")
+        # Group images into rows
+        for i in range(0, len(uploaded_files), num_per_row):
+            row_imgs = uploaded_files[i:i + num_per_row]
+            processed_imgs = []
 
-            # Auto-rotate tall images
-            if auto_rotate and img.height > img.width:
-                img = img.rotate(90, expand=True)
+            max_row_height = 0
+            for file in row_imgs:
+                img = Image.open(file)
+                if img.mode != "RGB":
+                    img = img.convert("RGB")
 
-            # Resize
-            if manual_resize and custom_width and custom_height:
-                img_width = custom_width
-                img_height = custom_height
-            else:
-                aspect_ratio = img.height / img.width
-                img_width = target_width
-                img_height = int(img_width * aspect_ratio)
+                # Auto rotate if needed
+                if auto_rotate and img.height > img.width:
+                    img = img.rotate(90, expand=True)
 
-            # Check for page overflow
-            if x_offset + img_width > a4_width - margin:
-                x_offset = margin
-                y_offset -= max_row_height + margin
-                max_row_height = 0
+                # Resize
+                if manual_resize and custom_width and custom_height:
+                    img_width = custom_width
+                    img_height = custom_height
+                else:
+                    aspect_ratio = img.height / img.width
+                    img_width = target_width
+                    img_height = int(img_width * aspect_ratio)
 
-            if y_offset - img_height < margin:
+                processed_imgs.append((img, img_width, img_height))
+                max_row_height = max(max_row_height, img_height)
+
+            # Page break if needed
+            if y_offset - max_row_height < margin:
                 c.showPage()
-                x_offset = margin
                 y_offset = a4_height - margin
-                max_row_height = 0
 
-            # Draw image
-            c.drawImage(ImageReader(img), x_offset, y_offset - img_height, width=img_width, height=img_height)
-            x_offset += img_width + margin
-            max_row_height = max(max_row_height, img_height)
+            # Draw all images in the row
+            x_offset = margin
+            for img, img_width, img_height in processed_imgs:
+                c.drawImage(ImageReader(img), x_offset, y_offset - img_height, width=img_width, height=img_height)
+                x_offset += img_width + margin
+
+            y_offset -= max_row_height + margin
 
         c.save()
         buffer.seek(0)
