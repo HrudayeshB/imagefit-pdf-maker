@@ -51,8 +51,7 @@ auto_rotate = st.checkbox("Auto-rotate tall images to fit landscape", value=True
 # A4 setup
 margin = 10
 a4_width, a4_height = A4
-total_margin_space = (num_per_row + 1) * margin
-target_width = int((a4_width - total_margin_space) / num_per_row)
+target_width = int((a4_width - (num_per_row + 1) * margin) / num_per_row)
 
 # Preview
 if uploaded_files and num_per_row > 0:
@@ -68,13 +67,12 @@ if st.button("Generate PDF"):
         buffer = io.BytesIO()
         c = canvas.Canvas(buffer, pagesize=A4)
 
+        # Preprocess: Convert, Rotate, Resize, Sort
         processed_images = []
-
-        for uploaded_file in uploaded_files:
-            img = Image.open(uploaded_file)
+        for file in uploaded_files:
+            img = Image.open(file)
             if img.mode != "RGB":
                 img = img.convert("RGB")
-
             if auto_rotate and img.height > img.width:
                 img = img.rotate(90, expand=True)
 
@@ -88,47 +86,39 @@ if st.button("Generate PDF"):
 
             processed_images.append((img, img_width, img_height))
 
-        # Sort tall images to the end
-        processed_images.sort(key=lambda x: x[2])  # sort by height
+        # Sort images by height (shortest first)
+        processed_images.sort(key=lambda x: x[2])
 
-        # Group images by similar height to reduce vertical gaps
-        grouped_rows = []
-        row = []
-        row_heights = []
-        for img, w, h in processed_images:
-            row.append((img, w, h))
-            row_heights.append(h)
-            if len(row) == num_per_row:
-                grouped_rows.append((row.copy(), max(row_heights)))
-                row = []
-                row_heights = []
-        if row:
-            grouped_rows.append((row, max(row_heights)))
+        # Dynamic column-wise fill
+        x_positions = [margin + i * (target_width + margin) for i in range(num_per_row)]
+        y_positions = [a4_height - margin] * num_per_row
 
-        # Start placing rows
-        y_offset = a4_height - margin
-        for row_imgs, row_height in grouped_rows:
-            x_offset = margin
-            if y_offset - row_height < margin:
+        for img, width, height in processed_images:
+            # Pick column with highest y-position (most space left)
+            col = y_positions.index(max(y_positions))
+            x = x_positions[col]
+            y = y_positions[col] - height
+
+            # Start new page if overflow
+            if y < margin:
                 c.showPage()
-                y_offset = a4_height - margin
-            for img, w, h in row_imgs:
-                y_pos = y_offset - h  # align bottom
-                c.drawImage(ImageReader(img), x_offset, y_pos, width=w, height=h)
-                x_offset += w + margin
-            y_offset -= row_height + margin
+                y_positions = [a4_height - margin] * num_per_row
+                y = y_positions[col] - height
+
+            c.drawImage(ImageReader(img), x, y, width=width, height=height)
+            y_positions[col] = y - margin
 
         c.save()
         buffer.seek(0)
         pdf_bytes = buffer.getvalue()
 
-        # Preview
+        # PDF Preview
         b64_pdf = base64.b64encode(pdf_bytes).decode('utf-8')
         st.markdown("### PDF Preview")
         pdf_display = f'<iframe src="data:application/pdf;base64,{b64_pdf}" width="100%" height="600px" type="application/pdf"></iframe>'
         st.markdown(pdf_display, unsafe_allow_html=True)
 
-        # Download
+        # Download Button
         st.download_button("⬇ Download PDF", data=pdf_bytes, file_name="output.pdf", mime="application/pdf")
     else:
         st.warning("Please upload images to generate the PDF.")
