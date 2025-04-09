@@ -23,7 +23,7 @@ st.markdown(f"<script>{js_code}</script>", unsafe_allow_html=True)
 # Title
 st.markdown("""
 <div style='text-align: center;'>
-    <h1 style='margin-bottom: 0;'> ImageFit PDF Maker</h1>
+    <h1 style='margin-bottom: 0;'>ImageFit - PDF Maker</h1>
     <p style='margin-top: 5px; font-size: 18px; opacity: 0.7;'>Fit images. Save paper.</p>
 </div>
 <hr style='border: 1px solid red;'>
