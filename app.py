@@ -21,7 +21,7 @@ with open("script.js") as js_file:
 st.markdown(f"<script>{js_code}</script>", unsafe_allow_html=True)
 
 # Title and Tagline
-st.markdown("<div style='text-align: center; font-size: 42px'>ImageFit PDF Maker</div>", unsafe_allow_html=True)
+st.markdown("<div style='text-align: center; font-size: 42px; font-weight: bold'>ImageFit PDF Maker</div>", unsafe_allow_html=True)
 st.markdown("<div style='text-align: center; font-size: 16px; opacity: 0.7;'>Fit images. Save paper.</div>", unsafe_allow_html=True)
 st.markdown("<hr style='border: 1px solid red;'>", unsafe_allow_html=True)
 
