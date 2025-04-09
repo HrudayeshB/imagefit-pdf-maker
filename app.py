@@ -20,11 +20,32 @@ with open("script.js") as js_file:
     js_code = js_file.read()
 st.markdown(f"<script>{js_code}</script>", unsafe_allow_html=True)
 
-# Title and Tagline (Fully Centered Using Flexbox)
+# Title and Tagline - Truly Full Page Centered
 st.markdown("""
-<div style="display: flex; justify-content: center; flex-direction: column; align-items: center; text-align: center;">
-    <h1 style='margin-bottom: 0;'>ImageFit PDF Maker</h1>
-    <p style='margin-top: 5px; font-size: 18px; color: #666;'>Smarter layout. Cleaner prints.</p>
+<style>
+.full-width-header {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    margin-top: 20px;
+}
+.full-width-header h1 {
+    margin-bottom: 0;
+    font-size: 42px;
+}
+.full-width-header p {
+    margin-top: 6px;
+    font-size: 18px;
+    color: #666;
+}
+</style>
+
+<div class="full-width-header">
+    <div>
+        <h1>ImageFit PDF Maker</h1>
+        <p>Smarter layout. Cleaner prints.</p>
+    </div>
 </div>
 <hr style='border: 1px solid red;'>
 """, unsafe_allow_html=True)
