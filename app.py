@@ -38,7 +38,6 @@ layout_map = {
 layout = st.selectbox("Choose Layout Size", list(layout_map.keys()), index=2)
 num_per_row = layout_map.get(layout, 1)
 
-st.markdown("Optional: Manual Resize")
 manual_resize = st.checkbox("Manually enter image width and height?")
 custom_width = None
 custom_height = None
