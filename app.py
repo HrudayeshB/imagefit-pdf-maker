@@ -41,6 +41,7 @@ layout_map = {
 layout = st.selectbox("Choose Layout Size", list(layout_map.keys()), index=2)
 num_per_row = layout_map.get(layout, 1)
 
+# Optional manual resize
 st.markdown("Optional: Manual Resize")
 manual_resize = st.checkbox("Manually enter image width and height?")
 
@@ -51,8 +52,8 @@ if manual_resize:
     custom_width = st.number_input("Custom Image Width (px)", min_value=100, max_value=1000, value=300, step=10)
     custom_height = st.number_input("Custom Image Height (px)", min_value=100, max_value=1200, value=400, step=10)
 
-# NEW: Auto-rotate tall images toggle
-auto_rotate = st.checkbox("Auto-rotate tall images to landscape", value=True)
+# Optional tall image auto-rotate
+rotate_tall = st.checkbox("Auto-rotate tall images to landscape")
 
 # A4 setup
 margin = 10
@@ -60,7 +61,7 @@ a4_width, a4_height = A4
 total_margin_space = (num_per_row + 1) * margin
 target_width = int((a4_width - total_margin_space) / num_per_row)
 
-# Image Preview
+# Image Previews
 if uploaded_files and num_per_row > 0:
     st.markdown("### Image Previews")
     cols = st.columns(num_per_row)
@@ -77,22 +78,28 @@ if st.button("Generate PDF"):
         x_offset = margin
         y_offset = a4_height - margin
 
-        def get_aspect_ratio(file):
+        # Preprocess images: rotate if needed and store with metadata
+        processed_images = []
+        for file in uploaded_files:
             img = Image.open(file)
+            rotated = False
+            if rotate_tall and img.height > img.width:
+                img = img.rotate(270, expand=True)
+                rotated = True
+            processed_images.append((file.name, img, rotated))
+
+        # Sort based on aspect ratio *after* rotation
+        def get_aspect_ratio(item):
+            _, img, _ = item
             return img.height / img.width
 
-        sorted_files = sorted(uploaded_files, key=get_aspect_ratio)
+        processed_images = sorted(processed_images, key=get_aspect_ratio)
 
-        for uploaded_file in sorted_files:
-            image = Image.open(uploaded_file)
+        for name, image, rotated in processed_images:
             if image.mode != "RGB":
                 image = image.convert("RGB")
 
-            # Rotate if auto-rotate is enabled and image is portrait
-            if auto_rotate and image.height > image.width:
-                image = image.rotate(90, expand=True)
-
-            # Resizing logic
+            # Manual or auto size
             if manual_resize and custom_width and custom_height:
                 img_width = custom_width
                 img_height = custom_height
@@ -101,16 +108,17 @@ if st.button("Generate PDF"):
                 img_width = target_width
                 img_height = int(img_width * aspect_ratio)
 
-            # New page if it doesn't fit horizontally
+            # New row if image doesn't fit horizontally
             if x_offset + img_width > a4_width - margin:
                 x_offset = margin
                 y_offset -= img_height + margin
 
-            # New page if it doesn't fit vertically
+            # New page if image doesn't fit vertically
             if y_offset - img_height < margin:
                 c.showPage()
                 y_offset = a4_height - margin
 
+            # Draw image
             c.drawImage(ImageReader(image), x_offset, y_offset - img_height, width=img_width, height=img_height)
             x_offset += img_width + margin
 
@@ -118,7 +126,7 @@ if st.button("Generate PDF"):
         buffer.seek(0)
         pdf_bytes = buffer.getvalue()
 
-        # PDF Preview
+        # Preview
         b64_pdf = base64.b64encode(pdf_bytes).decode('utf-8')
         st.markdown("### PDF Preview")
         pdf_display = f'<iframe src="data:application/pdf;base64,{b64_pdf}" width="100%" height="600px" type="application/pdf"></iframe>'
