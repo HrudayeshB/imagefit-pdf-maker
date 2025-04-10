@@ -6,20 +6,54 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
 import base64
-from pdf2image import convert_from_bytes  # ✅ Added for live PDF preview
+from pdf2image import convert_from_bytes
 
 # Page config
 st.set_page_config(page_title="ImageFit PDF Maker", layout="centered")
 
 # Custom CSS
-css_path = os.path.join(os.path.dirname(__file__), "style.css")
-with open(css_path) as f:
-    st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+st.markdown("""
+    <style>
+    .scroll-btn {
+        position: fixed;
+        right: 15px;
+        padding: 10px 14px;
+        border: none;
+        border-radius: 30px;
+        font-size: 18px;
+        background-color: #FF4B4B;
+        color: white;
+        z-index: 999;
+        box-shadow: 0px 0px 6px rgba(0,0,0,0.2);
+        transition: 0.3s;
+        opacity: 0.9;
+    }
+    .scroll-btn:hover {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+    #scroll-top {
+        bottom: 80px;
+    }
+    #scroll-bottom {
+        bottom: 20px;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
-# Inject JavaScript
-with open("script.js") as js_file:
-    js_code = js_file.read()
-st.markdown(f"<script>{js_code}</script>", unsafe_allow_html=True)
+# Inject scroll JS
+st.markdown("""
+    <script>
+    function scrollToTop() {
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+    function scrollToBottom() {
+        window.scrollTo({top: document.body.scrollHeight, behavior: 'smooth'});
+    }
+    </script>
+    <button id="scroll-top" class="scroll-btn" onclick="scrollToTop()">↑</button>
+    <button id="scroll-bottom" class="scroll-btn" onclick="scrollToBottom()">↓</button>
+""", unsafe_allow_html=True)
 
 # Title and Tagline
 st.markdown("<div style='text-align: center; font-size: 42px; font-weight: bold'>ImageFit PDF Maker</div>", unsafe_allow_html=True)
@@ -95,12 +129,10 @@ if st.button("Generate PDF"):
         y_positions = [a4_height - margin] * num_per_row
 
         for img, width, height in processed_images:
-            # Pick column with highest y-position (most space left)
             col = y_positions.index(max(y_positions))
             x = x_positions[col]
             y = y_positions[col] - height
 
-            # Start new page if overflow
             if y < margin:
                 c.showPage()
                 y_positions = [a4_height - margin] * num_per_row
@@ -113,11 +145,9 @@ if st.button("Generate PDF"):
         buffer.seek(0)
         pdf_bytes = buffer.getvalue()
 
-        # Modern PDF Preview using images
-        # Modern PDF Preview using images
+        # PDF Preview
         st.markdown("### PDF Preview")
         preview_images = convert_from_bytes(pdf_bytes, dpi=150)
-
         if len(preview_images) == 1:
             st.image(preview_images[0], use_container_width=True)
         else:
