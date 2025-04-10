@@ -6,6 +6,7 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.utils import ImageReader
 import base64
+from pdf2image import convert_from_bytes  # ✅ Added for live PDF preview
 
 # Page config
 st.set_page_config(page_title="ImageFit PDF Maker", layout="centered")
@@ -112,11 +113,11 @@ if st.button("Generate PDF"):
         buffer.seek(0)
         pdf_bytes = buffer.getvalue()
 
-        # PDF Preview
-        b64_pdf = base64.b64encode(pdf_bytes).decode('utf-8')
+        # Modern PDF Preview using images
         st.markdown("### PDF Preview")
-        pdf_display = f'<iframe src="data:application/pdf;base64,{b64_pdf}" width="100%" height="600px" type="application/pdf"></iframe>'
-        st.markdown(pdf_display, unsafe_allow_html=True)
+        preview_images = convert_from_bytes(pdf_bytes, dpi=150)
+        for img in preview_images:
+            st.image(img, use_column_width=True)
 
         # Download Button
         st.download_button("⬇ Download PDF", data=pdf_bytes, file_name="output.pdf", mime="application/pdf")
