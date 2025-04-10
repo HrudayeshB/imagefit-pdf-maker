@@ -141,3 +141,29 @@ input[type="number"]::-webkit-inner-spin-button,
     color: black;
     font-weight: bold;
 }
+
+/* Floating Scroll Buttons */
+.scroll-btn {
+    position: fixed;
+    right: 15px;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 30px;
+    font-size: 18px;
+    background-color: #FF4B4B;
+    color: white;
+    z-index: 9999;
+    box-shadow: 0px 0px 6px rgba(0,0,0,0.2);
+    transition: 0.3s;
+    opacity: 0.9;
+}
+.scroll-btn:hover {
+    opacity: 1;
+    transform: scale(1.05);
+}
+#scroll-top {
+    bottom: 80px;
+}
+#scroll-bottom {
+    bottom: 20px;
+}
