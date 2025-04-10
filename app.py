@@ -114,13 +114,18 @@ if st.button("Generate PDF"):
         pdf_bytes = buffer.getvalue()
 
         # Modern PDF Preview using images
+        # Modern PDF Preview using images
         st.markdown("### PDF Preview")
         preview_images = convert_from_bytes(pdf_bytes, dpi=150)
-        for i in range(0, len(preview_images), 2):
-            cols = st.columns(2)
-            cols[0].image(preview_images[i], use_container_width=True)
-            if i + 1 < len(preview_images):
-                cols[1].image(preview_images[i + 1], use_container_width=True)
+
+        if len(preview_images) == 1:
+            st.image(preview_images[0], use_container_width=True)
+        else:
+            for i in range(0, len(preview_images), 2):
+                cols = st.columns(2)
+                cols[0].image(preview_images[i], use_container_width=True)
+                if i + 1 < len(preview_images):
+                    cols[1].image(preview_images[i + 1], use_container_width=True)
 
         # Download Button
         st.download_button("⬇ Download PDF", data=pdf_bytes, file_name="output.pdf", mime="application/pdf")
