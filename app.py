@@ -55,12 +55,12 @@ a4_width, a4_height = A4
 target_width = int((a4_width - (num_per_row + 1) * margin) / num_per_row)
 
 # Preview
-if uploaded_files and num_per_row > 0:
+if uploaded_files:
     st.markdown("### Image Previews")
-    cols = st.columns(num_per_row)
+    preview_cols = st.columns(4)
     for i, file in enumerate(uploaded_files):
         img = Image.open(file)
-        cols[i % num_per_row].image(img, use_container_width=True)
+        preview_cols[i % 4].image(img, use_container_width=True)
 
 # PDF Generation
 if st.button("Generate PDF"):
@@ -116,8 +116,11 @@ if st.button("Generate PDF"):
         # Modern PDF Preview using images
         st.markdown("### PDF Preview")
         preview_images = convert_from_bytes(pdf_bytes, dpi=150)
-        for img in preview_images:
-            st.image(img, use_container_width=True)
+        for i in range(0, len(preview_images), 2):
+            cols = st.columns(2)
+            cols[0].image(preview_images[i], use_container_width=True)
+            if i + 1 < len(preview_images):
+                cols[1].image(preview_images[i + 1], use_container_width=True)
 
         # Download Button
         st.download_button("⬇ Download PDF", data=pdf_bytes, file_name="output.pdf", mime="application/pdf")
