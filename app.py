@@ -117,7 +117,7 @@ if st.button("Generate PDF"):
         st.markdown("### PDF Preview")
         preview_images = convert_from_bytes(pdf_bytes, dpi=150)
         for img in preview_images:
-            st.image(img, use_column_width=True)
+            st.image(img, use_container_width=True)
 
         # Download Button
         st.download_button("⬇ Download PDF", data=pdf_bytes, file_name="output.pdf", mime="application/pdf")
