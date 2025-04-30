@@ -3,7 +3,7 @@ from PIL import Image
 import io
 import os
 from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import A4
+from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.utils import ImageReader
 from pdf2image import convert_from_bytes  # Used for live PDF preview
 
@@ -50,10 +50,16 @@ if manual_resize:
 
 # Auto-rotate tall images option
 auto_rotate = st.checkbox("Auto-rotate tall images to fit landscape", value=True)
+landscape_mode = st.checkbox("Landscape mode", value=False)
 
 # PDF page and image placement setup
 margin = 10
-a4_width, a4_height = A4
+
+if landscape_mode:
+    a4_width, a4_height = landscape(A4)
+else:
+    a4_width, a4_height = A4
+
 target_width = int((a4_width - (num_per_row + 1) * margin) / num_per_row)
 
 # Static 4-column preview layout (independent of PDF layout)
@@ -68,7 +74,7 @@ if uploaded_files:
 if st.button("Generate PDF"):
     if uploaded_files:
         buffer = io.BytesIO()
-        c = canvas.Canvas(buffer, pagesize=A4)
+        c = canvas.Canvas(buffer, pagesize=(a4_width, a4_height))
 
         # Preprocess: rotate, resize, convert
         processed_images = []
